@@ -1,0 +1,5 @@
+# Ignore dependecies of both elixir and node to avoid problems in production
+# and keep the image size smaller.
+assets/node_modules/
+deps/
+priv/plts/
