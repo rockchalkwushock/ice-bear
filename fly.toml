@@ -2,25 +2,21 @@
 
 app = "small-snow-8785"
 
-kill_signal = "SIGINT"
+kill_signal = "SIGTERM"
 kill_timeout = 5
 
 [env]
 
-[experimental]
-  allowed_public_ports = []
-  auto_rollback = true
+[deploy]
+  release_command = "/app/bin/ice_bear eval IceBear.Release.migrate"
 
 [[services]]
-  http_checks = []
-  internal_port = 8080
+  internal_port = 4000
   protocol = "tcp"
-  script_checks = []
 
   [services.concurrency]
     hard_limit = 25
     soft_limit = 20
-    type = "connections"
 
   [[services.ports]]
     handlers = ["http"]
@@ -31,7 +27,7 @@ kill_timeout = 5
     port = 443
 
   [[services.tcp_checks]]
-    grace_period = "1s"
+    grace_period = "30s"
     interval = "15s"
     restart_limit = 6
     timeout = "2s"
