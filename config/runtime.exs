@@ -12,6 +12,12 @@ if config_env() == :prod do
     System.get_env("FLY_APP_NAME") ||
       raise "FLY_APP_NAME not available"
 
+  bot_token =
+    System.get_env("TELEGRAM_BOT_TOKEN") ||
+      raise """
+      environment variable TELEGRAM_BOT_TOKEN is missing.
+      """
+
   config :ice_bear, IceBearWeb.Endpoint,
     server: true,
     url: [host: "#{app_name}.fly.dev", port: 80],
@@ -34,4 +40,7 @@ if config_env() == :prod do
     # IMPORTANT: Or it won't find the DB server
     socket_options: [:inet6],
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+
+  config :ice_bear,
+    bot_token: bot_token
 end
