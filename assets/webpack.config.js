@@ -1,7 +1,7 @@
 // Native
 const { resolve } = require('path')
 // Third-Party
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+// const CopyWebpackPlugin = require('copy-webpack-plugin')
 // https://github.com/privatenumber/esbuild-loader
 const { ESBuildMinifyPlugin } = require('esbuild-loader')
 const { sync } = require('glob')
@@ -46,9 +46,6 @@ module.exports = (env, options) => {
       path: resolve(__dirname, '../priv/static/js'),
       publicPath: '/js/',
     },
-    plugins: [
-      new MiniCssExtractPlugin({ filename: '../css/app.css' }),
-      new CopyWebpackPlugin({ patterns: [{ from: 'static/', to: '../' }] }),
-    ],
+    plugins: [new MiniCssExtractPlugin({ filename: '../css/app.css' })],
   }
 }
