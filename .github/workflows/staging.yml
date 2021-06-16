@@ -52,6 +52,7 @@ jobs:
           path: |
             deps
             _build
+            priv/plts
           key: ${{ runner.os }}-mix-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-
@@ -68,17 +69,65 @@ jobs:
       - name: Install Dependencies (Elixir/OTP)
         if: steps.mix-cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p priv/plts
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
           mix deps.compile
+          mix dialyzer --plt
 
       - name: Install Dependencies (Node)
         if: steps.pnpm-cache.outputs.cache-hit != 'true'
         run: pnpm install
 
+  static-code-analysis:
+    name: Analyze Ice Bear
+    needs: dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.11']
+        node: ['14.x']
+        otp: ['24.0.2']
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Elixir/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Retrieve Cached Dependencies (Elixir/OTP)
+        uses: actions/cache@v2
+        id: mix-cache
+        with:
+          path: |
+            deps
+            _build
+            priv/plts
+          key: ${{ runner.os }}-mix-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - name: Check Formatting
+        run: mix format --check-formatted
+
+      - name: Run Credo
+        run: mix credo
+
+      - name: Run Dialyzer
+        run: mix dialyzer --no-check --ignore-exit-status
+
   test:
-    name: Validate Ice Bear
+    name: Test Ice Bear
     needs: dependencies
     runs-on: ubuntu-latest
     strategy:
@@ -129,6 +178,7 @@ jobs:
           path: |
             deps
             _build
+            piv/plts
           key: ${{ runner.os }}-mix-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-
