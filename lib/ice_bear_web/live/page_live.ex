@@ -1,4 +1,5 @@
 defmodule IceBearWeb.PageLive do
+  @moduledoc false
   use IceBearWeb, :live_view
 
   @impl true

@@ -1,0 +1,196 @@
+# https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
+# https://github.com/marketplace/actions/github-action-for-flyctl
+# https://dev.to/mnishiguchi/basic-github-actions-setup-for-phoenix-apps-m3g
+# https://www.mitchellhanberg.com/ci-cd-with-phoenix-github-actions-and-gigalixir/
+name: Staging
+
+on:
+  pull_request:
+    branches:
+      - staging
+
+env:
+  MIX_ENV: test
+
+jobs:
+  dependencies:
+    name: Initialize Ice Bear
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.11']
+        node: ['14.x']
+        otp: ['24.0.2']
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Elixir/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install pnpm
+        run: sudo npm install -g pnpm
+
+      - name: Retrieve Cached Dependencies (Elixir/OTP)
+        uses: actions/cache@v2
+        id: mix-cache
+        with:
+          path: |
+            deps
+            _build
+            priv/plts
+          key: ${{ runner.os }}-mix-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - name: Retrieve Cached Dependencies (Node)
+        uses: actions/cache@v2
+        id: pnpm-cache
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies (Elixir/OTP)
+        if: steps.mix-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p priv/plts
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+          mix deps.compile
+          mix dialyzer --plt
+
+      - name: Install Dependencies (Node)
+        if: steps.pnpm-cache.outputs.cache-hit != 'true'
+        run: pnpm install
+
+  static-code-analysis:
+    name: Analyze Ice Bear
+    needs: dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.11']
+        node: ['14.x']
+        otp: ['24.0.2']
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Elixir/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Retrieve Cached Dependencies (Elixir/OTP)
+        uses: actions/cache@v2
+        id: mix-cache
+        with:
+          path: |
+            deps
+            _build
+            priv/plts
+          key: ${{ runner.os }}-mix-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - name: Check Formatting
+        run: mix format --check-formatted
+
+      - name: Run Credo
+        run: mix credo
+
+      - name: Run Dialyzer
+        run: mix dialyzer --no-check --ignore-exit-status
+
+  test:
+    name: Test Ice Bear
+    needs: dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.11']
+        node: ['14.x']
+        otp: ['24.0.2']
+
+    services:
+      db:
+        env:
+          POSTGRES_PASSWORD: postgres
+        image: postgres:11
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports: ['5432:5432']
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Install Elixir/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install pnpm
+        run: sudo npm install -g pnpm
+
+      - name: Retrieve Cached Dependencies (Elixir/OTP)
+        uses: actions/cache@v2
+        id: mix-cache
+        with:
+          path: |
+            deps
+            _build
+            priv/plts
+          key: ${{ runner.os }}-mix-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - name: Retrieve Cached Dependencies (Node)
+        uses: actions/cache@v2
+        id: pnpm-cache
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Run Test Suite
+        run: mix test --trace --slowest 10
