@@ -14,9 +14,19 @@
     "phoenix_live_view": "file:../deps/phoenix_live_view"
   },
   "devDependencies": {
+    "autoprefixer": "~10.2.6",
     "copy-webpack-plugin": "~9.0.0",
+    "css-loader": "~5.2.6",
     "esbuild-loader": "~2.13.1",
     "glob": "~7.1.7",
+    "mini-css-extract-plugin": "~1.6.0",
+    "postcss": "~8.3.4",
+    "postcss-import": "~14.0.2",
+    "postcss-loader": "~6.1.0",
+    "postcss-preset-env": "~6.7.0",
+    "sass": "~1.35.1",
+    "sass-loader": "~12.1.0",
+    "tailwindcss": "~2.1.4",
     "webpack": "~5.39.0",
     "webpack-cli": "~4.7.2"
   }
