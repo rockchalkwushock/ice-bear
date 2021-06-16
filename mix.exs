@@ -58,10 +58,11 @@ defmodule IceBear.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
+      setup: ["deps.get", "ecto.setup", "cmd pnpm install"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      start: ["phx.server"]
     ]
   end
 end

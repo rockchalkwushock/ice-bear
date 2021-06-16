@@ -19,11 +19,9 @@ config :ice_bear, IceBearWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-stdin",
+    pnpm: [
+      "run",
+      "watch",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]
