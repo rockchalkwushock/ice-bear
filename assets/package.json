@@ -2,7 +2,12 @@
   "repository": {},
   "description": " ",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "NODE_ENV=production webpack --mode production",
+    "dev": "NODE_ENV=development webpack --mode development --no-color",
+    "preinstall": "npx only-allow pnpm",
+    "watch": "NODE_ENV=development webpack --mode development --no-color --watch"
+  },
   "dependencies": {
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
