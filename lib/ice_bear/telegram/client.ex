@@ -18,6 +18,13 @@ defmodule IceBear.Telegram.Client do
     |> parse_response()
   end
 
+  def get_updates do
+    :get
+    |> Finch.build("#{@api_base_uri}/bot#{fetch_token()}/getUpdates", [], nil)
+    |> Finch.request(__MODULE__)
+    |> parse_response()
+  end
+
   defp fetch_token, do: Application.fetch_env!(:ice_bear, :bot_token)
 
   defp parse_response({:ok, %Response{body: body}}), do: body |> Jason.decode!()
