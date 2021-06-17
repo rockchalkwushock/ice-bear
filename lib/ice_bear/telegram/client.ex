@@ -29,6 +29,20 @@ defmodule IceBear.Telegram.Client do
     |> parse_response()
   end
 
+  def send_message(chat_id, text) do
+    :post
+    |> Finch.build(
+      "#{@api_base_uri}/bot#{fetch_token()}/sendMessage",
+      @default_headers,
+      Jason.encode!(%{
+        "chat_id" => chat_id,
+        "text" => text
+      })
+    )
+    |> Finch.request(__MODULE__)
+    |> parse_response()
+  end
+
   defp fetch_token, do: Application.fetch_env!(:ice_bear, :bot_token)
 
   defp parse_response({:ok, %Response{body: body}}), do: body |> Jason.decode!()
