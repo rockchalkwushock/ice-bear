@@ -1,6 +1,10 @@
 defmodule IceBear.Telegram.Client do
   alias Finch.Response
   @api_base_uri "https://api.telegram.org"
+  @default_headers [
+    {"Accept", "application/json"},
+    {"Content-Type", "application/json"}
+  ]
   @pool_size 2
 
   def child_spec do
@@ -13,14 +17,14 @@ defmodule IceBear.Telegram.Client do
 
   def get_me do
     :get
-    |> Finch.build("#{@api_base_uri}/bot#{fetch_token()}/getMe", [], nil)
+    |> Finch.build("#{@api_base_uri}/bot#{fetch_token()}/getMe", @default_headers, nil)
     |> Finch.request(__MODULE__)
     |> parse_response()
   end
 
   def get_updates do
     :get
-    |> Finch.build("#{@api_base_uri}/bot#{fetch_token()}/getUpdates", [], nil)
+    |> Finch.build("#{@api_base_uri}/bot#{fetch_token()}/getUpdates", @default_headers, nil)
     |> Finch.request(__MODULE__)
     |> parse_response()
   end
