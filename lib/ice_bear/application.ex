@@ -14,9 +14,9 @@ defmodule IceBear.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: IceBear.PubSub},
       # Start the Endpoint (http/https)
-      IceBearWeb.Endpoint
-      # Start a worker by calling: IceBear.Worker.start_link(arg)
-      # {IceBear.Worker, arg}
+      IceBearWeb.Endpoint,
+      # Start Finch Connection Pool.
+      IceBear.Telegram.Client.child_spec()
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
