@@ -18,7 +18,7 @@ defmodule IceBear.Application do
       # Start Finch Connection Pool.
       IceBear.Telegram.Client.child_spec(),
       # Start the BotSupervisor that will start processes
-      # for the Bot & BotPoller.
+      # for the Bot & BotPolar.
       IceBear.Telegram.BotSupervisor
     ]
 

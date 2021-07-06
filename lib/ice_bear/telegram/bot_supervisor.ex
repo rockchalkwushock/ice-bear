@@ -9,7 +9,7 @@ defmodule IceBear.Telegram.BotSupervisor do
   def init(key) do
     children = [
       {IceBear.Telegram.Bot, key},
-      {IceBear.Telegram.BotPoller, key}
+      {IceBear.Telegram.BotPolar, key}
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

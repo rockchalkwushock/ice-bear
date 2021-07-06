@@ -1,4 +1,4 @@
-defmodule IceBear.Telegram.BotPoller do
+defmodule IceBear.Telegram.BotPolar do
   @moduledoc """
 
   """
@@ -13,7 +13,7 @@ defmodule IceBear.Telegram.BotPoller do
 
   @impl GenServer
   def init(_opts) do
-    Logger.info("----> IceBear.Telegram.BotPoller.init/1")
+    Logger.info("----> IceBear.Telegram.BotPolar.init/1")
     {:ok, %{"id" => id, "username" => username}} = Telegram.Client.get_me()
 
     state = %{
@@ -28,7 +28,7 @@ defmodule IceBear.Telegram.BotPoller do
 
   @impl GenServer
   def handle_info(:start, %{last_seen: last_seen} = state) do
-    Logger.info("----> IceBear.Telegram.BotPoller.handle_info/2")
+    Logger.info("----> IceBear.Telegram.BotPolar.handle_info/2")
 
     state =
       case Telegram.Client.get_updates(last_seen) do
