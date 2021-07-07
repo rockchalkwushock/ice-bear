@@ -1,6 +1,6 @@
 defmodule IceBear.Telegram.BotPolar do
   @moduledoc """
-
+  Operates as a polling service for IceBear to receive updates.
   """
   use GenServer
   require Logger
