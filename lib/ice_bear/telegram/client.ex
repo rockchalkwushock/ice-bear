@@ -43,6 +43,23 @@ defmodule IceBear.Telegram.Client do
     |> process_response()
   end
 
+  def get_updates(last_seen) do
+    Logger.debug("----> IceBear.Telegram.Client.get_updates/1")
+
+    :get
+    |> Finch.build(
+      "#{@api_base_uri}/bot#{fetch_token()}/getUpdates",
+      @default_headers,
+      Jason.encode!(%{
+        "offset" => last_seen + 1,
+        "timeout" => 30
+      })
+    )
+    |> Finch.request(__MODULE__)
+    |> parse_response()
+    |> process_response()
+  end
+
   defp fetch_token, do: Application.fetch_env!(:ice_bear, :bot_token)
 
   defp parse_response({:ok, %Response{body: body}}), do: body |> Jason.decode!()
