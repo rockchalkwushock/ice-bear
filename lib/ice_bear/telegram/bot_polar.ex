@@ -5,6 +5,7 @@ defmodule IceBear.Telegram.BotPolar do
   use GenServer
   require Logger
 
+  alias Phoenix.PubSub
   import IceBear.Telegram.Client, except: [send_message: 2]
 
   def start_link(opts) do
@@ -38,6 +39,15 @@ defmodule IceBear.Telegram.BotPolar do
         {:ok, updates} ->
           last_seen =
             Enum.map(updates, fn update ->
+              # Broadcast any update from Telegram so that any
+              # module subscribed to "ice_bear:<id>" can respond
+              # in whatever predetermined fashion.
+              PubSub.broadcast!(
+                IceBear.PubSub,
+                "ice_bear:#{state.id}",
+                {:update, update}
+              )
+
               update["update_id"]
             end)
             |> Enum.max(fn -> last_seen end)
