@@ -16,7 +16,10 @@ defmodule IceBear.Application do
       # Start the Endpoint (http/https)
       IceBearWeb.Endpoint,
       # Start Finch Connection Pool.
-      IceBear.Telegram.Client.child_spec()
+      IceBear.Telegram.Client.child_spec(),
+      # Start the BotSupervisor that will start processes
+      # for the Bot & BotPolar.
+      IceBear.Telegram.BotSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
