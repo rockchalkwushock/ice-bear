@@ -20,3 +20,8 @@ config :ice_bear, IceBearWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+bot_token = System.get_env("TELEGRAM_BOT_TOKEN")
+
+config :ice_bear,
+  bot_token: bot_token

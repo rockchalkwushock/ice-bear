@@ -11,6 +11,7 @@ on:
 
 env:
   MIX_ENV: test
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
 jobs:
   dependencies:
