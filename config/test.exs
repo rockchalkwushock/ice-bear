@@ -25,5 +25,3 @@ bot_token = System.get_env("TELEGRAM_BOT_TOKEN")
 
 config :ice_bear,
   bot_token: bot_token
-
-import_config "test.secret.exs"
