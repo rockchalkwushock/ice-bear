@@ -8,9 +8,17 @@ defmodule IceBear.Telegram.BotPolar do
   alias Phoenix.PubSub
   import IceBear.Telegram.Client, except: [send_message: 2]
 
+  ######################
+  # Client API
+  ######################
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, opts)
   end
+
+  ######################
+  # GenServer Callbacks
+  ######################
 
   @impl true
   def init(_opts) do
@@ -63,6 +71,10 @@ defmodule IceBear.Telegram.BotPolar do
     next_loop()
     {:noreply, state}
   end
+
+  ##################
+  # Module Utilities
+  ##################
 
   defp next_loop do
     Process.send_after(self(), :start, 0)
