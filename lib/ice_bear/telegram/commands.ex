@@ -1,4 +1,14 @@
 defmodule IceBear.Telegram.Commands do
+  @moduledoc """
+  Module represents all the commands that Ice Bear can except and act on
+  that are built into his config on Telegram.
+
+  Commands:
+  - /create
+  - /delete
+  - /read
+  - /update
+  """
   require Logger
 
   def command([:create, opts]),
